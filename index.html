@@ -1,1 +1,742 @@
-1
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Família Gutierres Games</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,sans-serif;color:#fff;min-height:100vh;
+ background:radial-gradient(circle at top,#44246e,#07101d 55%,#03060c);
+}
+button{border:0;color:white;font-weight:bold;cursor:pointer}
+header{text-align:center;padding:25px 10px}
+.logo{font-size:clamp(30px,8vw,55px);font-weight:900}
+.p{color:#a78bfa}.c{color:#22d3ee}
+.sub{color:#aab5c8}
+.wrap{width:min(1050px,94%);margin:auto}
+.panel{
+ background:#0d1728dd;border:1px solid #30415f;border-radius:25px;
+ padding:20px;box-shadow:0 15px 50px #0008
+}
+.players,.games{display:grid;gap:12px}
+.players{grid-template-columns:repeat(4,1fr)}
+.player{
+ padding:15px 5px;background:#1a2943;border-radius:17px;
+ border:2px solid transparent
+}
+.player.active{border-color:#a78bfa;background:#2b2050}
+.avatar{display:block;font-size:35px}
+.games{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:15px}
+.game{
+ min-height:155px;text-align:left;padding:17px;border-radius:20px;
+ background:linear-gradient(145deg,#1c2c4a,#101a2d);
+ border:1px solid #334563
+}
+.game:active{transform:scale(.97)}
+.icon{font-size:42px}.game h3{margin:7px 0}
+.game p{color:#9caac0;font-size:13px;margin:0}
+.title{text-align:center;font-size:30px}
+.help{text-align:center;color:#9daac0}
+.score{text-align:center;margin:15px}.score b{color:#c4b5fd}
+.screen{display:none;padding:15px 0 40px}.screen.active{display:block}
+.top{margin-bottom:12px}.back,.secondary{background:#263752;padding:12px 17px;border-radius:13px}
+.primary{background:linear-gradient(135deg,#8b5cf6,#6d28d9);padding:13px 18px;border-radius:13px}
+.controls{text-align:center;margin:15px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* COBRINHA */
+#snakeCanvas{
+ display:block;width:min(94vw,600px);height:auto;margin:auto;
+ background:#071b12;border:3px solid #376847;border-radius:22px
+}
+.dpad{
+ width:310px;margin:20px auto;display:grid;
+ grid-template-columns:repeat(3,95px);gap:8px;justify-content:center
+}
+.dpad button{
+ width:95px;height:75px;border-radius:20px;
+ background:#334967;font-size:32px
+}
+
+/* RUNNER */
+#runnerCanvas{
+ display:block;width:100%;height:auto;background:#091326;
+ border-radius:18px;border:1px solid #334563;touch-action:none
+}
+
+/* MEMÓRIA */
+.memory{
+ max-width:520px;margin:auto;display:grid;
+ grid-template-columns:repeat(4,1fr);gap:10px
+}
+.memory button{
+ aspect-ratio:1;border-radius:16px;background:#263957;
+ font-size:30px;color:transparent
+}
+.memory button.flip,.memory button.ok{background:white;color:#111}
+.memory button.ok{border:3px solid #22c55e}
+
+/* QUIZ */
+.question{text-align:center;font-size:22px;padding:20px}
+.options{display:grid;gap:10px;max-width:650px;margin:auto}
+.options button{padding:16px;text-align:left;background:#1c2b45;border-radius:14px}
+
+/* ALVO */
+#targetArea{
+ position:relative;height:55vh;min-height:330px;overflow:hidden;
+ border-radius:20px;background:radial-gradient(circle,#1c395a,#070d18);
+}
+.target{
+ position:absolute;width:70px;height:70px;border-radius:50%;
+ background:#ef4444;border:8px solid white;
+ box-shadow:0 0 0 7px #ef444455,0 0 25px #f00
+}
+
+/* TABUADA */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:600px;margin:auto}
+.tabs button{padding:13px 4px;border-radius:12px;background:#1c2b45}
+.tabs button.sel{background:#7c3aed}
+.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:500px;margin:auto}
+.answers button{padding:18px;border-radius:15px;background:#1c2b45;font-size:18px}
+
+/* VELHA */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:390px;margin:20px auto}
+.board button{aspect-ratio:1;background:#1c2b45;border-radius:18px;font-size:50px}
+
+/* TETRIS */
+#tetrisCanvas{display:block;width:250px;max-width:90vw;margin:auto;background:#050a12;border:2px solid #30415f}
+footer{text-align:center;color:#68758c;padding:25px}
+
+@media(max-width:600px){
+ .players{grid-template-columns:repeat(2,1fr)}
+ .games{grid-template-columns:repeat(2,1fr)}
+ .game{min-height:145px}
+ .dpad{grid-template-columns:repeat(3,82px);width:270px}
+ .dpad button{width:82px;height:70px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="home" class="wrap">
+<header>
+<div class="logo">🎮 FAMÍLIA <span class="p">GUTIERRES</span> <span class="c">GAMES</span></div>
+<div class="sub">Diversão em família ❤️</div>
+</header>
+
+<div class="panel">
+<h2>👤 Quem vai jogar?</h2>
+
+<div class="players">
+<button class="player active" onclick="player('Danilo',this)">🧔<br>Danilo<br><small id="d1">0 pts</small></button>
+<button class="player" onclick="player('Adriana',this)">👩<br>Adriana<br><small id="d2">0 pts</small></button>
+<button class="player" onclick="player('Lívia',this)">👧<br>Lívia<br><small id="d3">0 pts</small></button>
+<button class="player" onclick="player('Ana',this)">👧<br>Ana<br><small id="d4">0 pts</small></button>
+</div>
+
+<h2>🎮 Jogos</h2>
+
+<div class="games">
+<button class="game" onclick="openGame('snake')"><span class="icon">🐍</span><h3>Cobrinha</h3><p>Coma as maçãs e cresça.</p></button>
+<button class="game" onclick="openGame('runner')"><span class="icon">⚡</span><h3>Pokémon Runner</h3><p>Faça o Pokémon pular os obstáculos.</p></button>
+<button class="game" onclick="openGame('memory')"><span class="icon">🃏</span><h3>Memória</h3><p>Encontre os pares de animais.</p></button>
+<button class="game" onclick="openGame('quiz')"><span class="icon">🧠</span><h3>Quiz</h3><p>Teste seus conhecimentos.</p></button>
+<button class="game" onclick="openGame('target')"><span class="icon">🎯</span><h3>Alvos</h3><p>Acerte dois alvos que mudam de lugar.</p></button>
+<button class="game" onclick="openGame('math')"><span class="icon">✖️</span><h3>Tabuada</h3><p>Resolva contas rapidamente.</p></button>
+<button class="game" onclick="openGame('ttt')"><span class="icon">❌</span><h3>Jogo da Velha</h3><p>Você contra o computador.</p></button>
+<button class="game" onclick="openGame('tetris')"><span class="icon">🧱</span><h3>Tetris</h3><p>Encaixe as peças.</p></button>
+</div>
+
+<h2>🏆 Ranking</h2>
+<div id="ranking"></div>
+</div>
+
+<footer>Família Gutierres Games ❤️</footer>
+</div>
+
+
+<!-- COBRINHA -->
+<section id="snake" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">🐍 Cobrinha</h1>
+<p class="help">Mais lenta, tela maior e corpo colorido.</p>
+<div class="score">Pontos: <b id="ss">0</b> | Recorde: <b id="sb">0</b></div>
+<canvas id="sc" width="600" height="600"></canvas>
+
+<div class="dpad">
+<button></button><button onclick="sd(0,-1)">⬆️</button><button></button>
+<button onclick="sd(-1,0)">⬅️</button><button onclick="sd(0,1)">⬇️</button><button onclick="sd(1,0)">➡️</button>
+</div>
+<div class="controls"><button class="primary" onclick="snakeStart()">▶️ Começar</button></div>
+</div>
+</section>
+
+
+<!-- RUNNER -->
+<section id="runner" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">⚡ Pokémon Runner</h1>
+<p class="help">Toque na tela ou aperte PULAR.</p>
+<div class="score">Pontos: <b id="rs">0</b> | Recorde: <b id="rb">0</b></div>
+<canvas id="rc" width="800" height="450"></canvas>
+<div class="controls">
+<button class="primary" onclick="runnerStart()">▶️ Começar</button>
+<button class="secondary" onclick="jump()">⬆️ PULAR</button>
+</div>
+</div>
+</section>
+
+
+<!-- MEMÓRIA -->
+<section id="memory" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">🃏 Memória</h1>
+<p class="help">Encontre os 8 pares.</p>
+<div class="score">Movimentos: <b id="mm">0</b></div>
+<div id="mg" class="memory"></div>
+<div class="controls"><button class="primary" onclick="memoryStart()">🔄 Novo jogo</button></div>
+</div>
+</section>
+
+
+<!-- QUIZ -->
+<section id="quiz" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">🧠 Quiz</h1>
+<div class="score">Pontos: <b id="qs">0</b></div>
+<div id="qc"></div>
+</div>
+</section>
+
+
+<!-- ALVOS -->
+<section id="target" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">🎯 Acerte os Alvos</h1>
+<p class="help">Dois aparecem ao mesmo tempo e mudam depois de cada acerto.</p>
+<div class="score">Pontos: <b id="ts">0</b> | Tempo: <b id="tt">30</b></div>
+<div id="targetArea"></div>
+<div class="controls"><button class="primary" onclick="targetStart()">▶️ Começar</button></div>
+</div>
+</section>
+
+
+<!-- TABUADA -->
+<section id="math" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">✖️ Tabuada</h1>
+<p class="help">Escolha uma tabuada.</p>
+
+<div id="setup">
+<div id="tabs" class="tabs"></div>
+<div class="controls"><button class="primary" onclick="mathStart()">▶️ Começar</button></div>
+</div>
+
+<div id="mathgame" style="display:none">
+<div class="score">
+Pontos: <b id="ms">0</b> |
+Acertos: <b id="mc">0</b> |
+Tempo: <b id="mt">30</b>
+</div>
+<div id="mq" class="question"></div>
+<div id="ma" class="answers"></div>
+</div>
+</div>
+</section>
+
+
+<!-- JOGO DA VELHA -->
+<section id="ttt" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">❌⭕ Jogo da Velha</h1>
+<p class="help" id="status">Sua vez — você é X.</p>
+<div id="board" class="board"></div>
+<div class="controls"><button class="primary" onclick="tttStart()">🔄 Reiniciar</button></div>
+</div>
+</section>
+
+
+<!-- TETRIS -->
+<section id="tetris" class="screen wrap">
+<div class="top"><button class="back" onclick="home()">← Menu</button></div>
+<div class="panel">
+<h1 class="title">🧱 Tetris</h1>
+<div class="score">Pontos: <b id="trs">0</b></div>
+<canvas id="tc" width="250" height="500"></canvas>
+<div class="controls">
+<button class="primary" onclick="tetrisStart()">▶️ Começar</button>
+<button class="secondary" onclick="tm(-1)">⬅️</button>
+<button class="secondary" onclick="drop()">⬇️</button>
+<button class="secondary" onclick="tm(1)">➡️</button>
+<button class="secondary" onclick="rotate()">🔄</button>
+</div>
+</div>
+</section>
+
+
+<script>
+/* SISTEMA */
+let current="";
+let pl=localStorage.getItem("fgplayer")||"Danilo";
+let points=JSON.parse(localStorage.getItem("fgpoints")||'{"Danilo":0,"Adriana":0,"Lívia":0,"Ana":0}');
+let rec=JSON.parse(localStorage.getItem("fgrecords")||"{}");
+
+function save(){
+ localStorage.setItem("fgplayer",pl);
+ localStorage.setItem("fgpoints",JSON.stringify(points));
+ localStorage.setItem("fgrecords",JSON.stringify(rec));
+ ranking();
+}
+function player(n,b){
+ pl=n;
+ document.querySelectorAll(".player").forEach(x=>x.classList.remove("active"));
+ b.classList.add("active");
+ save();
+}
+function award(game,n){
+ points[pl]+=n;
+ if(n>(rec[game]||0))rec[game]=n;
+ save();
+}
+function ranking(){
+ d1.textContent=points.Danilo+" pts";
+ d2.textContent=points.Adriana+" pts";
+ d3.textContent=points["Lívia"]+" pts";
+ d4.textContent=points.Ana+" pts";
+ let names=Object.keys(points).sort((a,b)=>points[b]-points[a]);
+ ranking.innerHTML=names.map((n,i)=>`<div style="padding:10px;border-bottom:1px solid #263752"> ${["🥇","🥈","🥉","4️⃣"][i]} <b>${n}</b> — ${points[n]} pts</div>`).join("");
+}
+function openGame(id){
+ document.getElementById("home").style.display="none";
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ current=id;
+ if(id==="snake")snakeStart();
+ if(id==="runner")runnerReset();
+ if(id==="memory")memoryStart();
+ if(id==="quiz")quizStart();
+ if(id==="target")targetReset();
+ if(id==="ttt")tttStart();
+ if(id==="math")mathSetup();
+ if(id==="tetris")tetrisReset();
+}
+function home(){
+ clearInterval(targetTimer);
+ clearInterval(mathTimer);
+ clearInterval(snakeTimer);
+ cancelAnimationFrame(runAnim);
+ cancelAnimationFrame(tAnim);
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ document.getElementById("home").style.display="block";
+ current="";
+ ranking();
+}
+ranking();
+
+
+/* ================= COBRINHA ================= */
+const sctx=sc.getContext("2d");
+let snake=[],food={},sx=1,sy=0,nx=1,ny=0,snakeTimer=null,snakeOn=false,sp=0;
+const G=24,C=600/G;
+
+function snakeStart(){
+ clearInterval(snakeTimer);
+ snakeOn=true;sp=0;sx=1;sy=0;nx=1;ny=0;
+ snake=[
+ {x:12,y:12},{x:11,y:12},{x:10,y:12},{x:9,y:12},{x:8,y:12}
+ ];
+ foodSnake();
+ ss.textContent=0;
+ sb.textContent=rec.snake||0;
+ drawSnake();
+ snakeTimer=setInterval(snakeStep,190);
+}
+function foodSnake(){
+ do{food={x:Math.floor(Math.random()*G),y:Math.floor(Math.random()*G)}}
+ while(snake.some(p=>p.x===food.x&&p.y===food.y));
+}
+function sd(x,y){
+ if(!snakeOn)return;
+ if(x===-sx&&y===-sy)return;
+ nx=x;ny=y;
+}
+function snakeStep(){
+ sx=nx;sy=ny;
+ let h={x:snake[0].x+sx,y:snake[0].y+sy};
+ if(h.x<0||h.x>=G||h.y<0||h.y>=G||
+ snake.some((p,i)=>i&&p.x===h.x&&p.y===h.y)){
+  clearInterval(snakeTimer);snakeOn=false;
+  award("snake",sp);
+  alert("🐍 Fim de jogo!\n"+pl+" fez "+sp+" pontos!");
+  return;
+ }
+ snake.unshift(h);
+ if(h.x===food.x&&h.y===food.y){
+  sp+=10;ss.textContent=sp;foodSnake();
+ }else snake.pop();
+ drawSnake();
+}
+function drawSnake(){
+ sctx.fillStyle="#06180e";sctx.fillRect(0,0,600,600);
+ for(let y=0;y<G;y++)for(let x=0;x<G;x++){
+  if((x+y)%2===0){sctx.fillStyle="#0b2517";sctx.fillRect(x*C,y*C,C,C)}
+ }
+ let fx=food.x*C+C/2,fy=food.y*C+C/2;
+ sctx.fillStyle="#ef4444";sctx.beginPath();sctx.arc(fx,fy,C*.35,0,Math.PI*2);sctx.fill();
+ sctx.fillStyle="#22c55e";sctx.fillRect(fx+2,fy-C*.43,5,12);
+
+ snake.forEach((p,i)=>{
+  let cx=p.x*C+C/2,cy=p.y*C+C/2;
+  if(i===0){
+   let g=sctx.createRadialGradient(cx-5,cy-7,1,cx,cy,C*.55);
+   g.addColorStop(0,"#fff");g.addColorStop(.25,"#86efac");g.addColorStop(1,"#15803d");
+   sctx.fillStyle=g;sctx.beginPath();sctx.arc(cx,cy,C*.47,0,Math.PI*2);sctx.fill();
+   sctx.fillStyle="#111";
+   sctx.beginPath();sctx.arc(cx-5,cy-5,3,0,Math.PI*2);sctx.arc(cx+5,cy-5,3,0,Math.PI*2);sctx.fill();
+  }else{
+   sctx.fillStyle=`hsl(${(i*42)%360},80%,55%)`;
+   sctx.beginPath();sctx.arc(cx,cy,C*.42,0,Math.PI*2);sctx.fill();
+   sctx.strokeStyle="#ffffff55";sctx.stroke();
+  }
+ });
+}
+
+
+/* ================= RUNNER ================= */
+const rctx=rc.getContext("2d");
+let rp,obs=[],runOn=false,runScore=0,runAnim,lastObs=0;
+
+function runnerReset(){
+ cancelAnimationFrame(runAnim);
+ runOn=false;obs=[];runScore=0;
+ rs.textContent=0;rb.textContent=rec.runner||0;
+ drawRunner();
+}
+function runnerStart(){
+ cancelAnimationFrame(runAnim);
+ runOn=true;obs=[];runScore=0;lastObs=performance.now();
+ rp={x:75,y:350,w:48,h:50,vy:0,j:false};
+ rs.textContent=0;
+ runAnim=requestAnimationFrame(runLoop);
+}
+function jump(){
+ if(runOn&&rp&&!rp.j){rp.vy=-14;rp.j=true}
+}
+function runLoop(t){
+ if(!runOn)return;
+ if(t-lastObs>850){
+  obs.push({x:800,y:375,w:45,h:55});
+  lastObs=t;
+ }
+ rp.vy+=.7;rp.y+=rp.vy;
+ if(rp.y>=350){rp.y=350;rp.vy=0;rp.j=false}
+ let speed=5+Math.min(5,runScore/1000);
+ obs.forEach(o=>o.x-=speed);
+ obs=obs.filter(o=>o.x>-80);
+ runScore++;rs.textContent=Math.floor(runScore/10);
+ for(let o of obs)
+  if(rp.x<o.x+o.w&&rp.x+rp.w>o.x&&rp.y<o.y+o.h&&rp.y+rp.h>o.y){
+   runOn=false;let s=Math.floor(runScore/10);award("runner",s);
+   alert("⚡ Game Over!\n"+pl+" fez "+s+" pontos!");return;
+  }
+ drawRunner();runAnim=requestAnimationFrame(runLoop);
+}
+function drawRunner(){
+ rctx.fillStyle="#071326";rctx.fillRect(0,0,800,450);
+ rctx.fillStyle="#102d4b";rctx.fillRect(0,0,800,390);
+ rctx.fillStyle="#fef3c7";rctx.beginPath();rctx.arc(650,70,35,0,Math.PI*2);rctx.fill();
+ rctx.fillStyle="#243a58";rctx.fillRect(0,400,800,50);
+ if(rp){
+  let x=rp.x,y=rp.y;
+  rctx.fillStyle="#f59e0b";rctx.beginPath();rctx.arc(x+24,y+24,23,0,Math.PI*2);rctx.fill();
+  rctx.fillStyle="#fbbf24";
+  rctx.beginPath();rctx.moveTo(x+4,y+8);rctx.lineTo(x+10,y-15);rctx.lineTo(x+22,y+5);rctx.lineTo(x+34,y-15);rctx.lineTo(x+44,y+8);rctx.fill();
+  rctx.fillStyle="#111";rctx.beginPath();rctx.arc(x+16,y+19,3,0,Math.PI*2);rctx.arc(x+33,y+19,3,0,Math.PI*2);rctx.fill();
+  rctx.fillStyle="#dc2626";rctx.fillRect(x+8,y+43,14,7);rctx.fillRect(x+29,y+43,14,7);
+ }
+ obs.forEach(o=>{
+  rctx.fillStyle="#ef4444";rctx.beginPath();
+  rctx.moveTo(o.x,o.y+o.h);rctx.lineTo(o.x+o.w/2,o.y);
+  rctx.lineTo(o.x+o.w,o.y+o.h);rctx.closePath();rctx.fill();
+ });
+}
+rc.addEventListener("pointerdown",jump);
+
+
+/* ================= MEMÓRIA ================= */
+let first=null,lock=false,moves=0,match=0;
+const animals=["🐶","🐱","🦊","🐼","🐸","🦄","🐵","🐨"];
+function memoryStart(){
+ first=null;lock=false;moves=0;match=0;mm.textContent=0;
+ let cards=[...animals,...animals].sort(()=>Math.random()-.5);
+ mg.innerHTML="";
+ cards.forEach((a,i)=>{
+  let b=document.createElement("button");
+  b.textContent=a;b.dataset.a=a;
+  b.onclick=()=>flip(b);
+  mg.appendChild(b);
+ });
+}
+function flip(b){
+ if(lock||b.classList.contains("flip")||b.classList.contains("ok"))return;
+ b.classList.add("flip");
+ if(!first){first=b;return}
+ moves++;mm.textContent=moves;lock=true;
+ if(first.dataset.a===b.dataset.a){
+  first.classList.add("ok");b.classList.add("ok");
+  first=null;lock=false;match++;
+  if(match===8){
+   let score=Math.max(100,1200-(moves-16)*25);
+   award("memory",score);
+   setTimeout(()=>alert("🃏 Parabéns!\n"+pl+" fez "+score+" pontos!"),300);
+  }
+ }else{
+  let a=first;setTimeout(()=>{a.classList.remove("flip");b.classList.remove("flip");first=null;lock=false},700);
+ }
+}
+
+
+/* ================= QUIZ ================= */
+const qs=[
+["Qual é a capital do Brasil?",["Brasília","São Paulo","Salvador","Recife"],0],
+["Quanto é 12 × 8?",["86","96","108","112"],1],
+["Qual planeta é conhecido como Planeta Vermelho?",["Terra","Marte","Júpiter","Vênus"],1],
+["Quantos lados tem um hexágono?",["5","6","7","8"],1],
+["Qual é o maior oceano?",["Atlântico","Pacífico","Índico","Ártico"],1],
+["Qual animal é mamífero?",["Tubarão","Golfinho","Polvo","Sardinha"],1],
+["Quanto é 144 ÷ 12?",["10","11","12","14"],2],
+["Qual é o resultado de 15 + 27?",["32","40","42","45"],2],
+["Qual animal é terrestre e muito rápido?",["Guepardo","Tartaruga","Elefante","Panda"],0],
+["Quantos minutos tem uma hora?",["30","45","60","90"],2]
+];
+let qi=0,qpoints=0;
+function quizStart(){qi=0;qpoints=0;qs.textContent=0;showQ()}
+function showQ(){
+ if(qi>=qs.length){
+  qc.innerHTML=`<div class="question">🏆<br>Quiz terminado!<br><br>${pl}: <b>${qpoints} pontos</b><br><br><button class="primary" onclick="quizStart()">Jogar novamente</button></div>`;
+  award("quiz",qpoints);return;
+ }
+ let q=qs[qi];
+ qc.innerHTML=`<div class="question"><small>Pergunta ${qi+1}/${qs.length}</small><br><br><b>${q[0]}</b></div><div class="options">${q[1].map((x,i)=>`<button onclick="answerQ(${i})">${String.fromCharCode(65+i)}) ${x}</button>`).join("")}</div>`;
+}
+function answerQ(i){
+ let q=qs[qi];
+ document.querySelectorAll(".options button").forEach(b=>b.disabled=true);
+ if(i===q[2]){qpoints+=100;qs.textContent=qpoints}
+ setTimeout(()=>{qi++;showQ()},500);
+}
+
+
+/* ================= ALVOS ================= */
+let targetTimer=null,targetTime=30,targetScore=0,targetOn=false;
+function targetReset(){
+ clearInterval(targetTimer);targetOn=false;targetScore=0;targetTime=30;
+ ts.textContent=0;tt.textContent=30;targetArea.innerHTML="";
+}
+function targetStart(){
+ clearInterval(targetTimer);targetOn=true;targetScore=0;targetTime=30;
+ ts.textContent=0;tt.textContent=30;spawnTargets();
+ targetTimer=setInterval(()=>{
+  targetTime--;tt.textContent=targetTime;
+  if(targetTime<=0){
+   clearInterval(targetTimer);targetOn=false;targetArea.innerHTML="";
+   award("target",targetScore);
+   alert("🎯 Tempo!\n"+pl+" fez "+targetScore+" pontos!");
+  }
+ },1000);
+}
+function spawnTargets(){
+ if(!targetOn)return;
+ targetArea.innerHTML="";
+ for(let i=0;i<2;i++){
+  let b=document.createElement("button");
+  b.className="target";
+  b.style.left=Math.random()*82+"%";
+  b.style.top=Math.random()*78+"%";
+  b.onclick=()=>{
+   targetScore+=10;ts.textContent=targetScore;spawnTargets();
+  };
+  targetArea.appendChild(b);
+ }
+}
+
+
+/* ================= TABUADA ================= */
+let table=2,mathTimer=null,mathTime=30,mathScore=0,mathCorrect=0,ma1=0,ma2=0;
+function mathSetup(){
+ setup.style.display="block";mathgame.style.display="none";
+ tabs.innerHTML="";
+ for(let i=2;i<=12;i++){
+  let b=document.createElement("button");
+  b.textContent="Tabuada "+i;
+  if(i===table)b.classList.add("sel");
+  b.onclick=()=>{
+   table=i;
+   document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("sel"));
+   b.classList.add("sel");
+  };
+  tabs.appendChild(b);
+ }
+}
+function mathStart(){
+ clearInterval(mathTimer);mathTime=30;mathScore=0;mathCorrect=0;
+ ms.textContent=0;mc.textContent=0;mt.textContent=30;
+ setup.style.display="none";mathgame.style.display="block";
+ mathQuestion();
+ mathTimer=setInterval(()=>{
+  mathTime--;mt.textContent=mathTime;
+  if(mathTime<=0){
+   clearInterval(mathTimer);
+   award("math",mathScore);
+   alert("✖️ Tempo!\n\n"+pl+"\nAcertos: "+mathCorrect+"\nPontos: "+mathScore);
+   mathSetup();
+  }
+ },1000);
+}
+function mathQuestion(){
+ ma1=table;ma2=Math.floor(Math.random()*11)+1;
+ let correct=ma1*ma2,a=new Set([correct]);
+ while(a.size<4)a.add(Math.max(0,correct+Math.floor(Math.random()*15)-7));
+ let arr=[...a].sort(()=>Math.random()-.5);
+ mq.innerHTML=`Quanto é <b>${ma1} × ${ma2}</b>?`;
+ ma.innerHTML=arr.map(x=>`<button onclick="mathAnswer(${x},${correct})">${x}</button>`).join("");
+}
+function mathAnswer(x,c){
+ if(x===c){mathCorrect++;mathScore+=100;mc.textContent=mathCorrect;ms.textContent=mathScore}
+ document.querySelectorAll(".answers button").forEach(b=>b.disabled=true);
+ setTimeout(mathQuestion,300);
+}
+
+
+/* ================= JOGO DA VELHA ================= */
+let boardData=[],gameEnd=false;
+function tttStart(){
+ boardData=Array(9).fill("");gameEnd=false;
+ status.textContent="Sua vez — você é X.";renderBoard();
+}
+function renderBoard(){
+ board.innerHTML="";
+ boardData.forEach((x,i)=>{
+  let b=document.createElement("button");b.textContent=x;b.onclick=()=>playTTT(i);board.appendChild(b);
+ });
+}
+function win(b){
+ let lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+ for(let l of lines)if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return b[l[0]];
+ if(b.every(Boolean))return"draw";return null;
+}
+function playTTT(i){
+ if(gameEnd||boardData[i])return;
+ boardData[i]="X";renderBoard();
+ let w=win(boardData);if(w)return finishTTT(w);
+ status.textContent="🤖 Computador...";
+ setTimeout(computer,300);
+}
+function computer(){
+ let empty=boardData.map((x,i)=>x?null:i).filter(x=>x!==null);
+ if(!empty.length)return;
+ let i=empty[Math.floor(Math.random()*empty.length)];
+ boardData[i]="O";renderBoard();
+ let w=win(boardData);if(w)finishTTT(w);else status.textContent="Sua vez — você é X.";
+}
+function finishTTT(w){
+ gameEnd=true;
+ if(w==="X"){status.textContent="🏆 Você venceu!";award("ttt",100)}
+ else if(w==="O")status.textContent="🤖 O computador venceu!";
+ else{status.textContent="🤝 Empate!";award("ttt",25)}
+}
+
+
+/* ================= TETRIS ================= */
+const tx=tc.getContext("2d");
+let tb=[],piece=null,tScore=0,tOn=false,tAnim=null,tLast=0,tAcc=0;
+const SH=[
+[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],
+[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],
+[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]
+];
+function tetrisReset(){
+ cancelAnimationFrame(tAnim);tOn=false;tScore=0;
+ tb=Array.from({length:20},()=>Array(10).fill(0));piece=null;
+ trs.textContent=0;drawTetris();
+}
+function tetrisStart(){
+ tetrisReset();tOn=true;newPiece();tLast=performance.now();
+ tAnim=requestAnimationFrame(tLoop);
+}
+function newPiece(){
+ let s=SH[Math.floor(Math.random()*SH.length)];
+ piece={s:s.map(r=>r.slice()),x:4,y:0};
+ if(collide()){tOn=false;award("tetris",tScore);alert("🧱 Game Over!");}
+}
+function collide(){
+ for(let y=0;y<piece.s.length;y++)for(let x=0;x<piece.s[y].length;x++)if(piece.s[y][x]){
+  let X=piece.x+x,Y=piece.y+y;
+  if(X<0||X>=10||Y>=20||(Y>=0&&tb[Y][X]))return true;
+ }
+ return false;
+}
+function merge(){
+ piece.s.forEach((r,y)=>r.forEach((v,x)=>{if(v)tb[piece.y+y][piece.x+x]=1}))
+}
+function lines(){
+ let n=0;
+ for(let y=19;y>=0;y--)if(tb[y].every(Boolean)){
+  tb.splice(y,1);tb.unshift(Array(10).fill(0));n++;y++;
+ }
+ tScore+=n*[0,100,300,500,800][n]||0;trs.textContent=tScore;
+}
+function tm(d){if(!tOn)return;piece.x+=d;if(collide())piece.x-=d;drawTetris()}
+function drop(){
+ if(!tOn)return;
+ piece.y++;
+ if(collide()){piece.y--;merge();lines();newPiece()}
+ drawTetris();
+}
+function rotate(){
+ if(!tOn)return;
+ let old=piece.s;
+ let r=old[0].map((_,i)=>old.map(row=>row[i]).reverse());
+ piece.s=r;if(collide())piece.s=old;drawTetris();
+}
+function tLoop(t){
+ if(!tOn)return;
+ tAcc+=t-tLast;tLast=t;
+ if(tAcc>600){drop();tAcc=0}
+ drawTetris();tAnim=requestAnimationFrame(tLoop);
+}
+function drawTetris(){
+ tx.fillStyle="#050a12";tx.fillRect(0,0,250,500);
+ tb.forEach((r,y)=>r.forEach((v,x)=>{if(v){tx.fillStyle="#8b5cf6";tx.fillRect(x*25+2,y*25+2,21,21)}}));
+ if(piece)piece.s.forEach((r,y)=>r.forEach((v,x)=>{if(v){tx.fillStyle="#22d3ee";tx.fillRect((piece.x+x)*25+2,(piece.y+y)*25+2,21,21)}}));
+}
+
+
+/* TECLADO */
+addEventListener("keydown",e=>{
+ if(current==="snake"){
+  if(e.key==="ArrowUp")sd(0,-1);
+  if(e.key==="ArrowDown")sd(0,1);
+  if(e.key==="ArrowLeft")sd(-1,0);
+  if(e.key==="ArrowRight")sd(1,0);
+ }
+ if(current==="runner"&&(e.code==="Space"||e.key==="ArrowUp"))jump();
+ if(current==="tetris"){
+  if(e.key==="ArrowLeft")tm(-1);
+  if(e.key==="ArrowRight")tm(1);
+  if(e.key==="ArrowDown")drop();
+  if(e.key==="ArrowUp")rotate();
+ }
+});
+</script>
+</body>
+</html>
