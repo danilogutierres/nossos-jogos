@@ -1,1 +1,3014 @@
-1
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080b16">
+<title>Família Gutierres Games</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+ margin:0;
+ font-family:Arial,Helvetica,sans-serif;
+ color:#fff;
+ background:
+ radial-gradient(circle at 20% 0%,#3b2770 0%,transparent 35%),
+ radial-gradient(circle at 100% 20%,#123e63 0%,transparent 35%),
+ #070a13;
+ min-height:100vh;
+}
+
+button{
+ font-family:inherit;
+ cursor:pointer;
+ border:0;
+ color:white;
+}
+
+.hidden{display:none!important}
+
+.container{
+ width:min(1100px,94%);
+ margin:auto;
+}
+
+header{
+ text-align:center;
+ padding:28px 10px 20px;
+}
+
+.logo{
+ font-size:clamp(32px,9vw,64px);
+ font-weight:1000;
+ letter-spacing:-3px;
+ text-shadow:0 5px 25px #000;
+}
+
+.logo .purple{color:#a78bfa}
+.logo .cyan{color:#22d3ee}
+
+.subtitle{
+ color:#aeb8cf;
+ margin-top:10px;
+ font-size:15px;
+}
+
+.panel{
+ background:linear-gradient(145deg,#12182a,#0b101d);
+ border:1px solid #293653;
+ border-radius:25px;
+ padding:20px;
+ box-shadow:0 18px 50px #0009;
+}
+
+.players{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:10px;
+ margin:20px 0;
+}
+
+.player{
+ padding:15px 8px;
+ border-radius:18px;
+ background:#18233a;
+ border:2px solid transparent;
+ text-align:center;
+ transition:.2s;
+}
+
+.player.active{
+ border-color:#a78bfa;
+ background:#28204a;
+ box-shadow:0 0 20px #8b5cf644;
+}
+
+.avatar{
+ font-size:38px;
+ display:block;
+ margin-bottom:7px;
+}
+
+.player small{
+ color:#8f9bb3;
+}
+
+.section-title{
+ font-size:23px;
+ font-weight:bold;
+ margin:25px 0 13px;
+}
+
+.games{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+ gap:14px;
+}
+
+.game{
+ min-height:175px;
+ text-align:left;
+ padding:18px;
+ border-radius:22px;
+ background:linear-gradient(145deg,#182440,#0f1728);
+ border:1px solid #30415f;
+ box-shadow:0 10px 30px #0007;
+ transition:.15s;
+}
+
+.game:active{transform:scale(.96)}
+.game:hover{transform:translateY(-4px)}
+
+.gameIcon{font-size:46px}
+.game h3{margin:10px 0 6px;font-size:19px}
+.game p{margin:0;color:#9da9c0;font-size:13px;line-height:1.4}
+
+.stats{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:10px;
+ margin-top:20px;
+}
+
+.stat{
+ text-align:center;
+ padding:14px;
+ border-radius:17px;
+ background:#111a2c;
+ border:1px solid #293653;
+}
+
+.stat b{
+ display:block;
+ font-size:23px;
+ color:#c4b5fd;
+}
+
+.stat small{color:#8491a9}
+
+.ranking{
+ margin-top:25px;
+}
+
+.rank{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:11px;
+ border-bottom:1px solid #202c43;
+}
+
+.rank:last-child{border-bottom:0}
+
+.rankPos{
+ width:35px;
+ font-size:21px;
+}
+
+.rankAvatar{font-size:25px}
+
+.rankName{flex:1}
+
+.rankPoints{
+ font-weight:bold;
+ color:#c4b5fd;
+}
+
+.screen{
+ display:none;
+ min-height:100vh;
+ padding:15px 0 40px;
+}
+
+.screen.active{display:block}
+
+.topbar{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:14px;
+}
+
+.back,.primary,.secondary{
+ padding:12px 17px;
+ border-radius:14px;
+ font-weight:bold;
+}
+
+.back,.secondary{
+ background:#263550;
+}
+
+.primary{
+ background:linear-gradient(135deg,#8b5cf6,#6d28d9);
+ box-shadow:0 7px 20px #7c3aed55;
+}
+
+.title{
+ text-align:center;
+ font-size:30px;
+ margin:4px 0 5px;
+}
+
+.help{
+ text-align:center;
+ color:#99a5bb;
+ font-size:14px;
+ margin:8px 0 17px;
+}
+
+.score{
+ text-align:center;
+ margin:12px;
+ color:#aeb8cc;
+}
+
+.score b{color:#c4b5fd}
+
+.controls{
+ display:flex;
+ justify-content:center;
+ flex-wrap:wrap;
+ gap:9px;
+ margin:18px 0;
+}
+
+/* SNAKE */
+
+#snakeCanvas{
+ display:block;
+ width:min(92vw,450px);
+ height:auto;
+ margin:auto;
+ border:3px solid #31573c;
+ border-radius:20px;
+ background:#0a2015;
+ box-shadow:0 0 30px #000;
+}
+
+.dpad{
+ width:270px;
+ margin:20px auto;
+ display:grid;
+ grid-template-columns:repeat(3,84px);
+ gap:7px;
+ justify-content:center;
+}
+
+.dpad button{
+ width:84px;
+ height:72px;
+ border-radius:20px;
+ background:linear-gradient(145deg,#3a4d72,#202e49);
+ font-size:32px;
+ box-shadow:0 7px 13px #0008;
+}
+
+.dpad button:active{
+ transform:scale(.9);
+ background:#7c3aed;
+}
+
+.empty{visibility:hidden}
+
+/* MEMORY */
+
+.memory{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:9px;
+ max-width:500px;
+ margin:auto;
+}
+
+.memory button{
+ aspect-ratio:1;
+ border-radius:16px;
+ background:linear-gradient(145deg,#273858,#17233a);
+ font-size:32px;
+ color:transparent;
+ border:2px solid #30415f;
+}
+
+.memory button.flipped,
+.memory button.matched{
+ background:#fff;
+ color:#111;
+}
+
+.memory button.matched{
+ border-color:#22c55e;
+}
+
+/* TIC TAC TOE */
+
+.ttt{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:9px;
+ max-width:380px;
+ margin:20px auto;
+}
+
+.ttt button{
+ aspect-ratio:1;
+ border-radius:18px;
+ background:#1b2943;
+ font-size:50px;
+ font-weight:900;
+}
+
+/* TARGET */
+
+.targetArea{
+ position:relative;
+ height:55vh;
+ min-height:330px;
+ overflow:hidden;
+ border-radius:18px;
+ background:
+ radial-gradient(circle,#172b4b,#070d18);
+ border:1px solid #2b3b59;
+}
+
+.target{
+ position:absolute;
+ width:64px;
+ height:64px;
+ border-radius:50%;
+ background:#ef4444;
+ border:8px solid white;
+ box-shadow:0 0 0 7px #ef444455,0 0 25px #ef4444aa;
+ animation:targetPop .15s ease-out;
+}
+
+@keyframes targetPop{
+ from{transform:scale(.3)}
+ to{transform:scale(1)}
+}
+
+/* RUNNER */
+
+#runnerCanvas{
+ display:block;
+ width:100%;
+ height:auto;
+ background:#0b1425;
+ border:1px solid #2b3b59;
+ border-radius:17px;
+ touch-action:none;
+}
+
+/* TETRIS */
+
+#tetrisCanvas{
+ display:block;
+ width:min(82vw,250px);
+ height:auto;
+ margin:auto;
+ background:#070d18;
+ border:2px solid #30415f;
+ border-radius:10px;
+}
+
+/* QUIZ */
+
+.question{
+ text-align:center;
+ font-size:21px;
+ line-height:1.5;
+ padding:20px 5px;
+}
+
+.quizOptions{
+ display:grid;
+ gap:10px;
+ max-width:700px;
+ margin:auto;
+}
+
+.quizOptions button{
+ padding:16px;
+ border-radius:15px;
+ text-align:left;
+ background:#1b2943;
+ border:1px solid #30415f;
+ font-size:15px;
+}
+
+.quizOptions button:active{transform:scale(.98)}
+
+.result{
+ text-align:center;
+ padding:25px;
+ background:#17233b;
+ border-radius:18px;
+}
+
+footer{
+ text-align:center;
+ color:#6f7d96;
+ padding:30px 0;
+ font-size:13px;
+}
+
+@media(max-width:600px){
+ .players{grid-template-columns:repeat(2,1fr)}
+ .games{grid-template-columns:repeat(2,1fr)}
+ .game{min-height:155px;padding:14px}
+ .gameIcon{font-size:38px}
+ .stats{grid-template-columns:repeat(3,1fr)}
+ .stat{padding:11px 4px}
+ .stat b{font-size:19px}
+}
+
+@media(max-width:360px){
+ .dpad{width:235px;grid-template-columns:repeat(3,72px)}
+ .dpad button{width:72px;height:65px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HOME ================= -->
+
+<main id="home" class="container">
+
+<header>
+ <div class="logo">
+  🎮 FAMÍLIA <span class="purple">GUTIERRES</span> <span class="cyan">GAMES</span>
+ </div>
+ <div class="subtitle">
+  Diversão, competição e momentos em família ❤️
+ </div>
+</header>
+
+<div class="panel">
+
+ <div class="section-title">👤 Quem vai jogar?</div>
+
+ <div class="players">
+
+  <button class="player active" onclick="selectPlayer('Danilo',this)">
+   <span class="avatar">🧔</span>
+   Danilo
+   <small id="pDanilo">0 pts</small>
+  </button>
+
+  <button class="player" onclick="selectPlayer('Adriana',this)">
+   <span class="avatar">👩</span>
+   Adriana
+   <small id="pAdriana">0 pts</small>
+  </button>
+
+  <button class="player" onclick="selectPlayer('Lívia',this)">
+   <span class="avatar">👧</span>
+   Lívia
+   <small id="pLivia">0 pts</small>
+  </button>
+
+  <button class="player" onclick="selectPlayer('Ana',this)">
+   <span class="avatar">👧</span>
+   Ana
+   <small id="pAna">0 pts</small>
+  </button>
+
+ </div>
+
+ <div class="stats">
+
+  <div class="stat">
+   <b id="totalPoints">0</b>
+   <small>Pontos</small>
+  </div>
+
+  <div class="stat">
+   <b id="totalGames">0</b>
+   <small>Partidas</small>
+  </div>
+
+  <div class="stat">
+   <b id="bestGame">—</b>
+   <small>Melhor jogo</small>
+  </div>
+
+ </div>
+
+ <div class="section-title">🎮 Escolha seu jogo</div>
+
+ <div class="games">
+
+  <button class="game" onclick="openGame('snake')">
+   <div class="gameIcon">🐍</div>
+   <h3>Cobrinha</h3>
+   <p>Coma as maçãs, cresça e tente bater seu recorde.</p>
+  </button>
+
+  <button class="game" onclick="openGame('runner')">
+   <div class="gameIcon">🏃</div>
+   <h3>Runner</h3>
+   <p>Corra, pule e sobreviva o máximo que conseguir.</p>
+  </button>
+
+  <button class="game" onclick="openGame('tetris')">
+   <div class="gameIcon">🧱</div>
+   <h3>Tetris</h3>
+   <p>Encaixe as peças e elimine linhas.</p>
+  </button>
+
+  <button class="game" onclick="openGame('quiz')">
+   <div class="gameIcon">🧠</div>
+   <h3>Quiz</h3>
+   <p>Responda perguntas e acumule pontos.</p>
+  </button>
+
+  <button class="game" onclick="openGame('memory')">
+   <div class="gameIcon">🃏</div>
+   <h3>Memória</h3>
+   <p>Encontre todos os pares com o menor número de movimentos.</p>
+  </button>
+
+  <button class="game" onclick="openGame('target')">
+   <div class="gameIcon">🎯</div>
+   <h3>Acerte o Alvo</h3>
+   <p>Seja rápido e acerte o máximo de alvos.</p>
+  </button>
+
+  <button class="game" onclick="openGame('ttt')">
+   <div class="gameIcon">❌</div>
+   <h3>Jogo da Velha</h3>
+   <p>Você contra o computador.</p>
+  </button>
+
+ </div>
+
+ <div class="ranking">
+  <div class="section-title">🏆 Ranking da Família</div>
+  <div id="ranking"></div>
+ </div>
+
+ <div class="controls">
+  <button class="secondary" onclick="resetAll()">
+   🗑️ Zerar tudo
+  </button>
+ </div>
+
+</div>
+
+<footer>
+ Família Gutierres Games ❤️<br>
+ Feito para jogar em família.
+</footer>
+
+</main>
+
+
+<!-- ================= SNAKE ================= -->
+
+<section id="snake" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🐍 Cobrinha</h1>
+<p class="help">Mais lenta, controles grandes e cobra com visual realista.</p>
+
+<div class="score">
+ Pontos: <b id="snakeScore">0</b>
+ &nbsp;|&nbsp;
+ Recorde: <b id="snakeBest">0</b>
+</div>
+
+<canvas id="snakeCanvas" width="450" height="450"></canvas>
+
+<div class="dpad">
+
+ <button class="empty"></button>
+
+ <button onclick="snakeDirection(0,-1)">⬆️</button>
+
+ <button class="empty"></button>
+
+ <button onclick="snakeDirection(-1,0)">⬅️</button>
+
+ <button onclick="snakeDirection(0,1)">⬇️</button>
+
+ <button onclick="snakeDirection(1,0)">➡️</button>
+
+</div>
+
+<div class="controls">
+ <button class="primary" onclick="startSnake()">▶️ Começar</button>
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= RUNNER ================= -->
+
+<section id="runner" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🏃 Runner</h1>
+<p class="help">Toque na tela ou pressione ESPAÇO para pular.</p>
+
+<div class="score">
+ Pontos: <b id="runnerScore">0</b>
+ &nbsp;|&nbsp;
+ Recorde: <b id="runnerBest">0</b>
+</div>
+
+<canvas id="runnerCanvas" width="800" height="450"></canvas>
+
+<div class="controls">
+ <button class="primary" onclick="startRunner()">▶️ Começar</button>
+ <button class="secondary" onclick="runnerJump()">⬆️ Pular</button>
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= TETRIS ================= -->
+
+<section id="tetris" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🧱 Tetris</h1>
+<p class="help">← → mover • ↓ descer • ↑ girar</p>
+
+<div class="score">
+ Pontos: <b id="tetrisScore">0</b>
+ &nbsp;|&nbsp;
+ Recorde: <b id="tetrisBest">0</b>
+</div>
+
+<canvas id="tetrisCanvas" width="250" height="500"></canvas>
+
+<div class="controls">
+ <button class="primary" onclick="startTetris()">▶️ Começar</button>
+ <button class="secondary" onclick="tetrisMove(-1)">⬅️</button>
+ <button class="secondary" onclick="tetrisDrop()">⬇️</button>
+ <button class="secondary" onclick="tetrisMove(1)">➡️</button>
+ <button class="secondary" onclick="tetrisRotate()">🔄</button>
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= QUIZ ================= -->
+
+<section id="quiz" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🧠 Quiz</h1>
+
+<div class="score">
+ Pontos: <b id="quizScore">0</b>
+</div>
+
+<div id="quizContent"></div>
+
+</div>
+</section>
+
+
+<!-- ================= MEMORY ================= -->
+
+<section id="memory" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🃏 Memória</h1>
+<p class="help">Encontre os oito pares.</p>
+
+<div class="score">
+ Movimentos: <b id="memoryMoves">0</b>
+</div>
+
+<div id="memoryGrid" class="memory"></div>
+
+<div class="controls">
+ <button class="primary" onclick="startMemory()">🔄 Novo jogo</button>
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= TARGET ================= -->
+
+<section id="target" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">🎯 Acerte o Alvo</h1>
+
+<div class="score">
+ Pontos: <b id="targetScore">0</b>
+ &nbsp;|&nbsp;
+ Tempo: <b id="targetTime">30</b>
+</div>
+
+<div id="targetArea" class="targetArea"></div>
+
+<div class="controls">
+ <button class="primary" onclick="startTarget()">▶️ Começar</button>
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= TIC TAC TOE ================= -->
+
+<section id="ttt" class="screen container">
+<div class="topbar">
+ <button class="back" onclick="goHome()">← Menu</button>
+</div>
+
+<div class="panel">
+
+<h1 class="title">❌⭕ Jogo da Velha</h1>
+
+<p class="help" id="tttStatus">Sua vez — você é X.</p>
+
+<div id="tttBoard" class="ttt"></div>
+
+<div class="controls">
+ <button class="primary" onclick="startTTT()">🔄 Reiniciar</button>
+</div>
+
+</div>
+</section>
+
+
+<script>
+
+/* =========================================================
+   SISTEMA
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+let currentGame = "";
+
+let selectedPlayer =
+ localStorage.getItem("gutierresPlayer") || "Danilo";
+
+let data =
+ JSON.parse(
+  localStorage.getItem("gutierresData") ||
+  '{"Danilo":0,"Adriana":0,"Lívia":0,"Ana":0}'
+ );
+
+let played =
+ Number(
+  localStorage.getItem("gutierresPlayed") || 0
+ );
+
+let records =
+ JSON.parse(
+  localStorage.getItem("gutierresGameRecords") || "{}"
+ );
+
+
+function saveData(){
+
+ localStorage.setItem(
+  "gutierresData",
+  JSON.stringify(data)
+ );
+
+ localStorage.setItem(
+  "gutierresPlayed",
+  played
+ );
+
+ localStorage.setItem(
+  "gutierresGameRecords",
+  JSON.stringify(records)
+ );
+
+ localStorage.setItem(
+  "gutierresPlayer",
+  selectedPlayer
+ );
+
+ updateHome();
+
+}
+
+
+function selectPlayer(name,button){
+
+ selectedPlayer = name;
+
+ document
+ .querySelectorAll(".player")
+ .forEach(
+  x=>x.classList.remove("active")
+ );
+
+ button.classList.add("active");
+
+ saveData();
+
+}
+
+
+function addPoints(points){
+
+ data[selectedPlayer] +=
+ Number(points) || 0;
+
+ played++;
+
+ saveData();
+
+}
+
+
+function saveGameRecord(game,score){
+
+ score = Math.floor(score);
+
+ if(score > (records[game] || 0)){
+
+  records[game] = score;
+
+ }
+
+ saveData();
+
+}
+
+
+function updateHome(){
+
+ ["Danilo","Adriana","Lívia","Ana"]
+ .forEach(name=>{
+
+  const id =
+   name === "Lívia"
+   ? "pLivia"
+   : "p"+name;
+
+  if($(id))
+   $(id).textContent =
+    data[name] + " pts";
+
+ });
+
+
+ const total =
+  Object.values(data)
+  .reduce((a,b)=>a+b,0);
+
+ $("totalPoints").textContent =
+  total;
+
+ $("totalGames").textContent =
+  played;
+
+
+ const gameList =
+  Object.entries(records)
+  .sort((a,b)=>b[1]-a[1]);
+
+
+ $("bestGame").textContent =
+  gameList.length
+  ? gameList[0][0]
+  : "—";
+
+
+ const ranking =
+  ["Danilo","Adriana","Lívia","Ana"]
+  .sort(
+   (a,b)=>data[b]-data[a]
+  );
+
+
+ const avatars = {
+  Danilo:"🧔",
+  Adriana:"👩",
+  Lívia:"👧",
+  Ana:"👧"
+ };
+
+
+ $("ranking").innerHTML =
+  ranking.map(
+   (name,i)=>`
+
+    <div class="rank">
+
+     <div class="rankPos">
+      ${["🥇","🥈","🥉","4️⃣"][i]}
+     </div>
+
+     <div class="rankAvatar">
+      ${avatars[name]}
+     </div>
+
+     <div class="rankName">
+      ${name}
+     </div>
+
+     <div class="rankPoints">
+      ${data[name]} pts
+     </div>
+
+    </div>
+
+   `
+  ).join("");
+
+
+ document
+ .querySelectorAll(".player")
+ .forEach(button=>{
+
+  const name =
+   button.textContent
+   .trim()
+   .split("\n")[0];
+
+ });
+
+}
+
+
+function resetAll(){
+
+ if(
+  confirm(
+   "Tem certeza que deseja apagar todos os pontos e recordes?"
+  )
+ ){
+
+  data = {
+   Danilo:0,
+   Adriana:0,
+   Lívia:0,
+   Ana:0
+  };
+
+  played = 0;
+
+  records = {};
+
+  saveData();
+
+ }
+
+}
+
+
+function openGame(id){
+
+ currentGame = id;
+
+ $("home").style.display =
+  "none";
+
+ document
+ .querySelectorAll(".screen")
+ .forEach(
+  x=>x.classList.remove("active")
+ );
+
+ $(id).classList.add("active");
+
+ if(id==="snake") startSnake();
+ if(id==="runner") resetRunner();
+ if(id==="tetris") resetTetris();
+ if(id==="quiz") startQuiz();
+ if(id==="memory") startMemory();
+ if(id==="target") resetTarget();
+ if(id==="ttt") startTTT();
+
+}
+
+
+function goHome(){
+
+ document
+ .querySelectorAll(".screen")
+ .forEach(
+  x=>x.classList.remove("active")
+ );
+
+ $("home").style.display =
+  "block";
+
+ currentGame = "";
+
+ updateHome();
+
+}
+
+
+/* =========================================================
+   🐍 SNAKE
+========================================================= */
+
+const snakeCanvas =
+ $("snakeCanvas");
+
+const snakeCtx =
+ snakeCanvas.getContext("2d");
+
+let snake = [];
+let snakeFood = {};
+let snakeDirX = 1;
+let snakeDirY = 0;
+let snakeNextX = 1;
+let snakeNextY = 0;
+let snakeTimer = null;
+let snakeRunning = false;
+let snakeScore = 0;
+
+const snakeSpeed = 165;
+const snakeGrid = 21;
+const snakeCell = 450 / snakeGrid;
+
+
+function startSnake(){
+
+ clearInterval(snakeTimer);
+
+ snakeRunning = true;
+ snakeScore = 0;
+
+ snake = [
+  {x:10,y:10},
+  {x:9,y:10},
+  {x:8,y:10},
+  {x:7,y:10},
+  {x:6,y:10}
+ ];
+
+ snakeDirX = 1;
+ snakeDirY = 0;
+ snakeNextX = 1;
+ snakeNextY = 0;
+
+ createSnakeFood();
+
+ $("snakeScore").textContent = 0;
+ $("snakeBest").textContent =
+  records.snake || 0;
+
+ drawSnake();
+
+ snakeTimer =
+  setInterval(
+   snakeStep,
+   snakeSpeed
+  );
+
+}
+
+
+function createSnakeFood(){
+
+ do{
+
+  snakeFood = {
+   x:Math.floor(Math.random()*snakeGrid),
+   y:Math.floor(Math.random()*snakeGrid)
+  };
+
+ }
+ while(
+  snake.some(
+   p=>
+    p.x===snakeFood.x &&
+    p.y===snakeFood.y
+  )
+ );
+
+}
+
+
+function snakeDirection(x,y){
+
+ if(!snakeRunning)
+  return;
+
+ if(
+  x===-snakeDirX &&
+  y===-snakeDirY
+ )
+  return;
+
+ snakeNextX = x;
+ snakeNextY = y;
+
+}
+
+
+function snakeStep(){
+
+ snakeDirX = snakeNextX;
+ snakeDirY = snakeNextY;
+
+ const head = {
+  x:snake[0].x+snakeDirX,
+  y:snake[0].y+snakeDirY
+ };
+
+ if(
+  head.x<0 ||
+  head.x>=snakeGrid ||
+  head.y<0 ||
+  head.y>=snakeGrid ||
+  snake.some(
+   (p,i)=>
+    i>0 &&
+    p.x===head.x &&
+    p.y===head.y
+  )
+ ){
+
+  endSnake();
+  return;
+
+ }
+
+ snake.unshift(head);
+
+ if(
+  head.x===snakeFood.x &&
+  head.y===snakeFood.y
+ ){
+
+  snakeScore += 10;
+
+  $("snakeScore").textContent =
+   snakeScore;
+
+  createSnakeFood();
+
+ }else{
+
+  snake.pop();
+
+ }
+
+ drawSnake();
+
+}
+
+
+function endSnake(){
+
+ clearInterval(snakeTimer);
+
+ snakeRunning = false;
+
+ saveGameRecord(
+  "snake",
+  snakeScore
+ );
+
+ addPoints(snakeScore);
+
+ setTimeout(
+  ()=>{
+   alert(
+    "🐍 Fim de jogo!\n\n" +
+    selectedPlayer +
+    ", você fez " +
+    snakeScore +
+    " pontos!"
+   );
+  },
+  50
+ );
+
+}
+
+
+function drawSnake(){
+
+ snakeCtx.fillStyle =
+  "#082116";
+
+ snakeCtx.fillRect(
+  0,0,450,450
+ );
+
+ /* grama */
+
+ for(let y=0;y<snakeGrid;y++){
+
+  for(let x=0;x<snakeGrid;x++){
+
+   if((x+y)%2===0){
+
+    snakeCtx.fillStyle =
+     "#0d2c1d";
+
+    snakeCtx.fillRect(
+     x*snakeCell,
+     y*snakeCell,
+     snakeCell,
+     snakeCell
+    );
+
+   }
+
+  }
+
+ }
+
+
+ /* maçã */
+
+ const fx =
+  snakeFood.x*snakeCell+
+  snakeCell/2;
+
+ const fy =
+  snakeFood.y*snakeCell+
+  snakeCell/2;
+
+ snakeCtx.fillStyle =
+  "#ef4444";
+
+ snakeCtx.beginPath();
+
+ snakeCtx.arc(
+  fx,
+  fy,
+  snakeCell*.36,
+  0,
+  Math.PI*2
+ );
+
+ snakeCtx.fill();
+
+ snakeCtx.fillStyle =
+  "#22c55e";
+
+ snakeCtx.fillRect(
+  fx+2,
+  fy-snakeCell*.42,
+  4,
+  9
+ );
+
+
+ /* cobra */
+
+ snake.forEach(
+  (p,i)=>{
+
+   const cx =
+    p.x*snakeCell+
+    snakeCell/2;
+
+   const cy =
+    p.y*snakeCell+
+    snakeCell/2;
+
+   if(i===0){
+
+    const gradient =
+     snakeCtx.createRadialGradient(
+      cx-3,
+      cy-4,
+      1,
+      cx,
+      cy,
+      snakeCell*.5
+     );
+
+    gradient.addColorStop(
+     0,
+     "#a7f3d0"
+    );
+
+    gradient.addColorStop(
+     1,
+     "#15803d"
+    );
+
+    snakeCtx.fillStyle =
+     gradient;
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx,
+     cy,
+     snakeCell*.47,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+    /* olhos */
+
+    let ex =
+     snakeDirX*3;
+
+    let ey =
+     snakeDirY*3;
+
+    snakeCtx.fillStyle =
+     "#fff";
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx-4+ex,
+     cy-4+ey,
+     3,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx+4+ex,
+     cy-4+ey,
+     3,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+    snakeCtx.fillStyle =
+     "#111";
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx-4+ex,
+     cy-4+ey,
+     1.3,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx+4+ex,
+     cy-4+ey,
+     1.3,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+   }else{
+
+    const g =
+     snakeCtx.createRadialGradient(
+      cx-2,
+      cy-2,
+      1,
+      cx,
+      cy,
+      snakeCell*.45
+     );
+
+    g.addColorStop(
+     0,
+     "#86efac"
+    );
+
+    g.addColorStop(
+     1,
+     "#166534"
+    );
+
+    snakeCtx.fillStyle = g;
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx,
+     cy,
+     snakeCell*.4,
+     0,
+     Math.PI*2
+    );
+
+    snakeCtx.fill();
+
+    snakeCtx.strokeStyle =
+     "#14532d";
+
+    snakeCtx.beginPath();
+
+    snakeCtx.arc(
+     cx,
+     cy,
+     snakeCell*.28,
+     0,
+     Math.PI
+    );
+
+    snakeCtx.stroke();
+
+   }
+
+  }
+ );
+
+}
+
+
+/* =========================================================
+   🧠 QUIZ
+========================================================= */
+
+const questions = [
+
+ [
+  "Qual é a capital do Brasil?",
+  ["Brasília","São Paulo","Rio de Janeiro","Salvador"],
+  0
+ ],
+
+ [
+  "Quanto é 12 × 8?",
+  ["86","96","108","112"],
+  1
+ ],
+
+ [
+  "Qual planeta é conhecido como Planeta Vermelho?",
+  ["Vênus","Marte","Júpiter","Mercúrio"],
+  1
+ ],
+
+ [
+  "Quantos lados possui um hexágono?",
+  ["5","6","7","8"],
+  1
+ ],
+
+ [
+  "Qual é o maior oceano da Terra?",
+  ["Atlântico","Índico","Pacífico","Ártico"],
+  2
+ ],
+
+ [
+  "Qual animal é um mamífero?",
+  ["Tubarão","Golfinho","Polvo","Sardinha"],
+  1
+ ],
+
+ [
+  "Quanto é 144 ÷ 12?",
+  ["10","11","12","14"],
+  2
+ ],
+
+ [
+  "Qual destes é um continente?",
+  ["Amazonas","Europa","Atlântico","Saara"],
+  1
+ ],
+
+ [
+  "Qual gás os seres humanos precisam para respirar?",
+  ["Oxigênio","Hélio","Hidrogênio","Metano"],
+  0
+ ],
+
+ [
+  "Qual é o resultado de 15 + 27?",
+  ["32","40","42","45"],
+  2
+ ],
+
+ [
+  "Qual é o animal terrestre mais rápido?",
+  ["Leão","Guepardo","Cavalo","Lobo"],
+  1
+ ],
+
+ [
+  "Quantos minutos existem em uma hora?",
+  ["30","45","60","90"],
+  2
+ ]
+
+];
+
+let quizIndex = 0;
+let quizScore = 0;
+
+
+function startQuiz(){
+
+ quizIndex = 0;
+ quizScore = 0;
+
+ $("quizScore").textContent = 0;
+
+ showQuestion();
+
+}
+
+
+function showQuestion(){
+
+ if(quizIndex>=questions.length){
+
+  $("quizContent").innerHTML = `
+
+   <div class="result">
+
+    <h2>🏆 Quiz concluído!</h2>
+
+    <p>
+     ${selectedPlayer},
+     você fez
+     <b>${quizScore}</b>
+     pontos.
+    </p>
+
+    <button
+     class="primary"
+     onclick="startQuiz()">
+     🔄 Jogar novamente
+    </button>
+
+   </div>
+
+  `;
+
+  saveGameRecord(
+   "quiz",
+   quizScore
+  );
+
+  addPoints(quizScore);
+
+  return;
+
+ }
+
+ const q =
+  questions[quizIndex];
+
+ let html = `
+
+  <div class="question">
+
+   <small>
+    Pergunta ${quizIndex+1}
+    de ${questions.length}
+   </small>
+
+   <br><br>
+
+   <b>${q[0]}</b>
+
+  </div>
+
+  <div class="quizOptions">
+
+ `;
+
+ q[1].forEach(
+  (answer,index)=>{
+
+   html += `
+
+    <button
+     onclick="answerQuiz(${index})">
+
+     ${String.fromCharCode(65+index)})
+     ${answer}
+
+    </button>
+
+   `;
+
+  }
+ );
+
+ html += "</div>";
+
+ $("quizContent").innerHTML =
+  html;
+
+}
+
+
+function answerQuiz(answer){
+
+ const q =
+  questions[quizIndex];
+
+ const buttons =
+  document.querySelectorAll(
+   ".quizOptions button"
+  );
+
+ buttons.forEach(
+  b=>b.disabled=true
+ );
+
+ if(answer===q[2]){
+
+  quizScore += 100;
+
+  buttons[answer]
+   .style.background =
+   "#166534";
+
+ }else{
+
+  buttons[answer]
+   .style.background =
+   "#991b1b";
+
+  buttons[q[2]]
+   .style.background =
+   "#166534";
+
+ }
+
+ $("quizScore").textContent =
+  quizScore;
+
+ setTimeout(
+  ()=>{
+   quizIndex++;
+   showQuestion();
+  },
+  600
+ );
+
+}
+
+
+/* =========================================================
+   🃏 MEMORY
+========================================================= */
+
+const memorySymbols =
+ [
+  "🐶","🐱","🦊","🐼",
+  "🐸","🦄","🐵","🐨"
+ ];
+
+let memoryCards = [];
+let memoryFirst = null;
+let memoryLock = false;
+let memoryMoves = 0;
+let memoryMatches = 0;
+
+
+function startMemory(){
+
+ memoryCards =
+  [...memorySymbols,...memorySymbols]
+  .sort(()=>Math.random()-.5);
+
+ memoryFirst = null;
+ memoryLock = false;
+ memoryMoves = 0;
+ memoryMatches = 0;
+
+ $("memoryMoves").textContent = 0;
+
+ $("memoryGrid").innerHTML = "";
+
+ memoryCards.forEach(
+  (symbol,index)=>{
+
+   const b =
+    document.createElement("button");
+
+   b.textContent = symbol;
+
+   b.onclick =
+    ()=>flipMemory(b,index);
+
+   $("memoryGrid")
+    .appendChild(b);
+
+  }
+ );
+
+}
+
+
+function flipMemory(button,index){
+
+ if(memoryLock)
+  return;
+
+ if(
+  button.classList.contains("flipped") ||
+  button.classList.contains("matched")
+ )
+  return;
+
+ button.classList.add("flipped");
+
+ if(memoryFirst===null){
+
+  memoryFirst = {
+   button,
+   index
+  };
+
+  return;
+
+ }
+
+ memoryMoves++;
+
+ $("memoryMoves").textContent =
+  memoryMoves;
+
+ const second = {
+  button,
+  index
+ };
+
+ memoryLock = true;
+
+ if(
+  memoryCards[memoryFirst.index] ===
+  memoryCards[second.index]
+ ){
+
+  memoryFirst.button
+   .classList.add("matched");
+
+  second.button
+   .classList.add("matched");
+
+  memoryMatches++;
+
+  memoryFirst = null;
+
+  memoryLock = false;
+
+  if(memoryMatches===8){
+
+   const score =
+    Math.max(
+     100,
+     1500 -
+     Math.max(0,memoryMoves-16)*30
+    );
+
+   saveGameRecord(
+    "memory",
+    score
+   );
+
+   addPoints(score);
+
+   setTimeout(
+    ()=>{
+     alert(
+      "🎉 Todos os pares encontrados!\n\n" +
+      "Pontos: "+score
+     );
+    },
+    250
+   );
+
+  }
+
+ }else{
+
+  setTimeout(
+   ()=>{
+
+    memoryFirst.button
+     .classList.remove("flipped");
+
+    second.button
+     .classList.remove("flipped");
+
+    memoryFirst = null;
+    memoryLock = false;
+
+   },
+   700
+  );
+
+ }
+
+}
+
+
+/* =========================================================
+   ❌⭕ TIC TAC TOE
+========================================================= */
+
+let board =
+ Array(9).fill("");
+
+let tttOver = false;
+
+
+function startTTT(){
+
+ board =
+  Array(9).fill("");
+
+ tttOver = false;
+
+ $("tttStatus").textContent =
+  "Sua vez — você é X.";
+
+ renderTTT();
+
+}
+
+
+function renderTTT(){
+
+ $("tttBoard").innerHTML = "";
+
+ board.forEach(
+  (value,index)=>{
+
+   const b =
+    document.createElement("button");
+
+   b.textContent = value;
+
+   b.onclick =
+    ()=>playTTT(index);
+
+   $("tttBoard")
+    .appendChild(b);
+
+  }
+ );
+
+}
+
+
+function winner(b){
+
+ const lines = [
+  [0,1,2],
+  [3,4,5],
+  [6,7,8],
+  [0,3,6],
+  [1,4,7],
+  [2,5,8],
+  [0,4,8],
+  [2,4,6]
+ ];
+
+ for(
+  const line of lines
+ ){
+
+  const [a,c,d] = line;
+
+  if(
+   b[a] &&
+   b[a]===b[c] &&
+   b[c]===b[d]
+  )
+   return b[a];
+
+ }
+
+ if(b.every(x=>x))
+  return "draw";
+
+ return null;
+
+}
+
+
+function winningMove(player){
+
+ for(
+  let i=0;i<9;i++
+ ){
+
+  if(!board[i]){
+
+   board[i]=player;
+
+   const w =
+    winner(board);
+
+   board[i]="";
+
+   if(w===player)
+    return i;
+
+  }
+
+ }
+
+ return null;
+
+}
+
+
+function playTTT(index){
+
+ if(tttOver || board[index])
+  return;
+
+ board[index]="X";
+
+ renderTTT();
+
+ let w =
+  winner(board);
+
+ if(w){
+
+  finishTTT(w);
+  return;
+
+ }
+
+ $("tttStatus").textContent =
+  "Computador pensando...";
+
+ setTimeout(
+  computerTTT,
+  350
+ );
+
+}
+
+
+function computerTTT(){
+
+ if(tttOver)
+  return;
+
+ let move =
+  winningMove("O");
+
+ if(move===null)
+  move =
+   winningMove("X");
+
+ if(move===null && !board[4])
+  move=4;
+
+ if(move===null){
+
+  const corners =
+   [0,2,6,8]
+   .filter(i=>!board[i]);
+
+  if(corners.length)
+   move =
+    corners[
+     Math.floor(
+      Math.random()*corners.length
+     )
+    ];
+
+ }
+
+ if(move===null){
+
+  const empty =
+   board
+   .map(
+    (v,i)=>v?null:i
+   )
+   .filter(
+    x=>x!==null
+   );
+
+  move =
+   empty[
+    Math.floor(
+     Math.random()*empty.length
+    )
+   ];
+
+ }
+
+ board[move]="O";
+
+ renderTTT();
+
+ const w =
+  winner(board);
+
+ if(w)
+  finishTTT(w);
+ else
+  $("tttStatus").textContent =
+   "Sua vez — você é X.";
+
+}
+
+
+function finishTTT(w){
+
+ tttOver = true;
+
+ if(w==="X"){
+
+  $("tttStatus").textContent =
+   "🏆 Você venceu!";
+
+  addPoints(100);
+  saveGameRecord("ttt",100);
+
+ }else if(w==="O"){
+
+  $("tttStatus").textContent =
+   "🤖 O computador venceu!";
+
+  addPoints(0);
+
+ }else{
+
+  $("tttStatus").textContent =
+   "🤝 Empate!";
+
+  addPoints(25);
+
+ }
+
+}
+
+
+/* =========================================================
+   🎯 TARGET
+========================================================= */
+
+let targetTimer = null;
+let targetRunning = false;
+let targetScore = 0;
+let targetSeconds = 30;
+
+
+function resetTarget(){
+
+ clearInterval(targetTimer);
+
+ targetRunning=false;
+ targetScore=0;
+ targetSeconds=30;
+
+ $("targetScore").textContent=0;
+ $("targetTime").textContent=30;
+ $("targetArea").innerHTML="";
+
+}
+
+
+function startTarget(){
+
+ clearInterval(targetTimer);
+
+ targetRunning=true;
+ targetScore=0;
+ targetSeconds=30;
+
+ $("targetScore").textContent=0;
+ $("targetTime").textContent=30;
+
+ spawnTarget();
+
+ targetTimer =
+  setInterval(
+   ()=>{
+
+    targetSeconds--;
+
+    $("targetTime").textContent =
+     targetSeconds;
+
+    if(targetSeconds<=0)
+     endTarget();
+
+   },
+   1000
+  );
+
+}
+
+
+function spawnTarget(){
+
+ if(!targetRunning)
+  return;
+
+ const area =
+  $("targetArea");
+
+ area.innerHTML="";
+
+ const target =
+  document.createElement("button");
+
+ target.className="target";
+
+ target.style.left =
+  Math.random()*85+"%";
+
+ target.style.top =
+  Math.random()*85+"%";
+
+ target.onclick =
+  hitTarget;
+
+ area.appendChild(target);
+
+}
+
+
+function hitTarget(){
+
+ if(!targetRunning)
+  return;
+
+ targetScore += 10;
+
+ $("targetScore").textContent =
+  targetScore;
+
+ spawnTarget();
+
+}
+
+
+function endTarget(){
+
+ clearInterval(targetTimer);
+
+ targetRunning=false;
+
+ $("targetArea").innerHTML="";
+
+ saveGameRecord(
+  "target",
+  targetScore
+ );
+
+ addPoints(targetScore);
+
+ alert(
+  "🎯 Tempo!\n\n" +
+  selectedPlayer +
+  ": "+targetScore+" pontos!"
+ );
+
+}
+
+
+/* =========================================================
+   🏃 RUNNER
+========================================================= */
+
+const runnerCanvas =
+ $("runnerCanvas");
+
+const runnerCtx =
+ runnerCanvas.getContext("2d");
+
+let runnerPlayer = null;
+let runnerObstacles = [];
+let runnerScore = 0;
+let runnerRunning = false;
+let runnerLastObstacle = 0;
+let runnerAnimation = null;
+
+
+function resetRunner(){
+
+ cancelAnimationFrame(
+  runnerAnimation
+ );
+
+ runnerRunning=false;
+ runnerPlayer=null;
+ runnerObstacles=[];
+ runnerScore=0;
+
+ $("runnerScore").textContent=0;
+ $("runnerBest").textContent =
+  records.runner || 0;
+
+ drawRunner();
+
+}
+
+
+function startRunner(){
+
+ cancelAnimationFrame(
+  runnerAnimation
+ );
+
+ runnerRunning=true;
+
+ runnerScore=0;
+
+ runnerObstacles=[];
+
+ runnerPlayer={
+  x:70,
+  y:355,
+  width:40,
+  height:45,
+  velocityY:0,
+  jumping:false
+ };
+
+ runnerLastObstacle =
+  performance.now();
+
+ $("runnerScore").textContent=0;
+
+ runnerAnimation =
+  requestAnimationFrame(
+   runnerLoop
+  );
+
+}
+
+
+function runnerJump(){
+
+ if(
+  !runnerRunning ||
+  !runnerPlayer
+ )
+  return;
+
+ if(!runnerPlayer.jumping){
+
+  runnerPlayer.velocityY=-14;
+
+  runnerPlayer.jumping=true;
+
+ }
+
+}
+
+
+function runnerLoop(time){
+
+ if(!runnerRunning)
+  return;
+
+ if(
+  time-runnerLastObstacle >
+  850
+ ){
+
+  runnerObstacles.push({
+   x:800,
+   y:375,
+   width:38,
+   height:55
+  });
+
+  runnerLastObstacle=time;
+
+ }
+
+ runnerPlayer.velocityY += .7;
+ runnerPlayer.y +=
+  runnerPlayer.velocityY;
+
+ if(runnerPlayer.y>=355){
+
+  runnerPlayer.y=355;
+  runnerPlayer.velocityY=0;
+  runnerPlayer.jumping=false;
+
+ }
+
+ const speed =
+  5 + Math.min(
+   5,
+   runnerScore/1200
+  );
+
+ runnerObstacles.forEach(
+  o=>o.x-=speed
+ );
+
+ runnerObstacles =
+  runnerObstacles.filter(
+   o=>o.x>-80
+  );
+
+ runnerScore++;
+
+ $("runnerScore").textContent =
+  Math.floor(runnerScore/10);
+
+ for(
+  const o of runnerObstacles
+ ){
+
+  if(
+
+   runnerPlayer.x<o.x+o.width &&
+   runnerPlayer.x+runnerPlayer.width>o.x &&
+   runnerPlayer.y<o.y+o.height &&
+   runnerPlayer.y+runnerPlayer.height>o.y
+
+  ){
+
+   endRunner();
+   return;
+
+  }
+
+ }
+
+ drawRunner();
+
+ runnerAnimation =
+  requestAnimationFrame(
+   runnerLoop
+  );
+
+}
+
+
+function endRunner(){
+
+ runnerRunning=false;
+
+ cancelAnimationFrame(
+  runnerAnimation
+ );
+
+ const score =
+  Math.floor(runnerScore/10);
+
+ saveGameRecord(
+  "runner",
+  score
+ );
+
+ addPoints(score);
+
+ alert(
+  "🏃 Fim de jogo!\n\n" +
+  selectedPlayer+
+  ": "+score+" pontos!"
+ );
+
+}
+
+
+function drawRunner(){
+
+ runnerCtx.fillStyle="#091326";
+
+ runnerCtx.fillRect(
+  0,0,800,450
+ );
+
+ /* céu */
+
+ runnerCtx.fillStyle="#111f39";
+
+ runnerCtx.fillRect(
+  0,0,800,390
+ );
+
+ /* lua */
+
+ runnerCtx.fillStyle="#f5f3ce";
+
+ runnerCtx.beginPath();
+
+ runnerCtx.arc(
+  650,
+  80,
+  35,
+  0,
+  Math.PI*2
+ );
+
+ runnerCtx.fill();
+
+ /* chão */
+
+ runnerCtx.fillStyle="#263753";
+
+ runnerCtx.fillRect(
+  0,400,800,50
+ );
+
+ if(runnerPlayer){
+
+  runnerCtx.fillStyle="#a78bfa";
+
+  runnerCtx.fillRect(
+   runnerPlayer.x,
+   runnerPlayer.y,
+   runnerPlayer.width,
+   runnerPlayer.height
+  );
+
+  runnerCtx.fillStyle="#fff";
+
+  runnerCtx.fillRect(
+   runnerPlayer.x+25,
+   runnerPlayer.y+8,
+   7,
+   7
+  );
+
+ }
+
+ runnerObstacles.forEach(
+  o=>{
+
+   runnerCtx.fillStyle="#ef4444";
+
+   runnerCtx.beginPath();
+
+   runnerCtx.moveTo(o.x,o.y+o.height);
+
+   runnerCtx.lineTo(
+    o.x+o.width/2,
+    o.y
+   );
+
+   runnerCtx.lineTo(
+    o.x+o.width,
+    o.y+o.height
+   );
+
+   runnerCtx.closePath();
+
+   runnerCtx.fill();
+
+  }
+ );
+
+}
+
+
+/* =========================================================
+   🧱 TETRIS
+========================================================= */
+
+const tCanvas =
+ $("tetrisCanvas");
+
+const tCtx =
+ tCanvas.getContext("2d");
+
+const T_COLS=10;
+const T_ROWS=20;
+const T_SIZE=25;
+
+let tBoard;
+let tPiece;
+let tScore=0;
+let tRunning=false;
+let tLast=0;
+let tAccum=0;
+let tAnim;
+
+
+const pieces=[
+
+ [[1,1,1,1]],
+
+ [[1,1],[1,1]],
+
+ [[0,1,0],[1,1,1]],
+
+ [[1,0,0],[1,1,1]],
+
+ [[0,0,1],[1,1,1]],
+
+ [[0,1,1],[1,1,0]],
+
+ [[1,1,0],[0,1,1]]
+
+];
+
+
+function createBoard(){
+
+ return Array.from(
+  {length:T_ROWS},
+  ()=>Array(T_COLS).fill(0)
+ );
+
+}
+
+
+function resetTetris(){
+
+ cancelAnimationFrame(tAnim);
+
+ tRunning=false;
+ tScore=0;
+ tBoard=createBoard();
+ tPiece=null;
+
+ $("tetrisScore").textContent=0;
+ $("tetrisBest").textContent =
+  records.tetris || 0;
+
+ drawTetris();
+
+}
+
+
+function startTetris(){
+
+ resetTetris();
+
+ tRunning=true;
+
+ spawnPiece();
+
+ tLast=performance.now();
+ tAccum=0;
+
+ tAnim =
+  requestAnimationFrame(
+   tetrisLoop
+  );
+
+}
+
+
+function spawnPiece(){
+
+ const shape =
+  pieces[
+   Math.floor(
+    Math.random()*pieces.length
+   )
+  ];
+
+ tPiece={
+  shape:shape.map(r=>r.slice()),
+  x:4,
+  y:0
+ };
+
+ if(tCollision())
+  endTetris();
+
+}
+
+
+function tCollision(){
+
+ if(!tPiece)
+  return false;
+
+ for(
+  let y=0;
+  y<tPiece.shape.length;
+  y++
+ ){
+
+  for(
+   let x=0;
+   x<tPiece.shape[y].length;
+   x++
+  ){
+
+   if(!tPiece.shape[y][x])
+    continue;
+
+   const bx =
+    tPiece.x+x;
+
+   const by =
+    tPiece.y+y;
+
+   if(
+    bx<0 ||
+    bx>=T_COLS ||
+    by>=T_ROWS
+   )
+    return true;
+
+   if(
+    by>=0 &&
+    tBoard[by][bx]
+   )
+    return true;
+
+  }
+
+ }
+
+ return false;
+
+}
+
+
+function mergePiece(){
+
+ tPiece.shape.forEach(
+  (row,y)=>{
+
+   row.forEach(
+    (v,x)=>{
+
+     if(v){
+
+      tBoard[
+       tPiece.y+y
+      ][
+       tPiece.x+x
+      ]=1;
+
+     }
+
+    }
+   );
+
+  }
+ );
+
+}
+
+
+function clearLines(){
+
+ let lines=0;
+
+ for(
+  let y=T_ROWS-1;
+  y>=0;
+  y--
+ ){
+
+  if(
+   tBoard[y].every(Boolean)
+  ){
+
+   tBoard.splice(y,1);
+
+   tBoard.unshift(
+    Array(T_COLS).fill(0)
+   );
+
+   lines++;
+
+   y++;
+
+  }
+
+ }
+
+ if(lines){
+
+  const points =
+   [0,100,300,500,800][lines];
+
+  tScore += points;
+
+  $("tetrisScore").textContent =
+   tScore;
+
+ }
+
+}
+
+
+function tetrisMove(dir){
+
+ if(!tRunning)
+  return;
+
+ tPiece.x+=dir;
+
+ if(tCollision())
+  tPiece.x-=dir;
+
+ drawTetris();
+
+}
+
+
+function tetrisDrop(){
+
+ if(!tRunning)
+  return;
+
+ tPiece.y++;
+
+ if(tCollision()){
+
+  tPiece.y--;
+
+  mergePiece();
+
+  clearLines();
+
+  spawnPiece();
+
+ }
+
+ drawTetris();
+
+}
+
+
+function tetrisRotate(){
+
+ if(!tRunning)
+  return;
+
+ const old =
+  tPiece.shape;
+
+ const rotated =
+  old[0].map(
+   (_,i)=>
+    old.map(
+     row=>row[i]
+    ).reverse()
+  );
+
+ tPiece.shape=rotated;
+
+ if(tCollision())
+  tPiece.shape=old;
+
+ drawTetris();
+
+}
+
+
+function tetrisLoop(time){
+
+ if(!tRunning)
+  return;
+
+ const delta =
+  time-tLast;
+
+ tLast=time;
+
+ tAccum+=delta;
+
+ const speed =
+  Math.max(
+   150,
+   650-
+   Math.floor(tScore/500)*45
+  );
+
+ if(tAccum>speed){
+
+  tetrisDrop();
+
+  tAccum=0;
+
+ }
+
+ drawTetris();
+
+ tAnim =
+  requestAnimationFrame(
+   tetrisLoop
+  );
+
+}
+
+
+function drawTetris(){
+
+ tCtx.fillStyle="#070d18";
+
+ tCtx.fillRect(
+  0,0,250,500
+ );
+
+ if(!tBoard)
+  return;
+
+ tBoard.forEach(
+  (row,y)=>{
+
+   row.forEach(
+    (v,x)=>{
+
+     if(v){
+
+      tCtx.fillStyle="#8b5cf6";
+
+      tCtx.fillRect(
+       x*T_SIZE+2,
+       y*T_SIZE+2,
+       T_SIZE-4,
+       T_SIZE-4
+      );
+
+     }
+
+    }
+   );
+
+  }
+ );
+
+ if(tPiece){
+
+  tPiece.shape.forEach(
+   (row,y)=>{
+
+    row.forEach(
+     (v,x)=>{
+
+      if(v){
+
+       tCtx.fillStyle="#22d3ee";
+
+       tCtx.fillRect(
+        (tPiece.x+x)*T_SIZE+2,
+        (tPiece.y+y)*T_SIZE+2,
+        T_SIZE-4,
+        T_SIZE-4
+       );
+
+      }
+
+     }
+    );
+
+   }
+  );
+
+ }
+
+}
+
+
+function endTetris(){
+
+ tRunning=false;
+
+ cancelAnimationFrame(tAnim);
+
+ saveGameRecord(
+  "tetris",
+  tScore
+ );
+
+ addPoints(tScore);
+
+ alert(
+  "🧱 Game Over!\n\n"+
+  selectedPlayer+
+  ": "+tScore+" pontos!"
+ );
+
+}
+
+
+/* =========================================================
+   TECLADO + TOQUE
+========================================================= */
+
+window.addEventListener(
+ "keydown",
+ event=>{
+
+  if(currentGame==="snake"){
+
+   if(event.key==="ArrowUp"){
+    event.preventDefault();
+    snakeDirection(0,-1);
+   }
+
+   if(event.key==="ArrowDown"){
+    event.preventDefault();
+    snakeDirection(0,1);
+   }
+
+   if(event.key==="ArrowLeft"){
+    event.preventDefault();
+    snakeDirection(-1,0);
+   }
+
+   if(event.key==="ArrowRight"){
+    event.preventDefault();
+    snakeDirection(1,0);
+   }
+
+  }
+
+  if(currentGame==="runner"){
+
+   if(
+    event.code==="Space" ||
+    event.key==="ArrowUp"
+   ){
+
+    event.preventDefault();
+    runnerJump();
+
+   }
+
+  }
+
+  if(currentGame==="tetris"){
+
+   if(event.key==="ArrowLeft"){
+    event.preventDefault();
+    tetrisMove(-1);
+   }
+
+   if(event.key==="ArrowRight"){
+    event.preventDefault();
+    tetrisMove(1);
+   }
+
+   if(event.key==="ArrowDown"){
+    event.preventDefault();
+    tetrisDrop();
+   }
+
+   if(event.key==="ArrowUp"){
+    event.preventDefault();
+    tetrisRotate();
+   }
+
+  }
+
+ }
+);
+
+
+/* toque no runner */
+
+$("runnerCanvas")
+ .addEventListener(
+  "pointerdown",
+  runnerJump
+ );
+
+
+/* inicialização */
+
+updateHome();
+
+</script>
+
+</body>
+</html>
